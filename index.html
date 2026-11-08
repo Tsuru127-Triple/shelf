@@ -370,6 +370,11 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 const KEY='ytl.v1';
 const DEF={apiKey:'',lists:[],channels:{},videos:{},seen:{},lastRefresh:0,sel:'all',hideSeen:false,rightTab:'list',recs:{},recNo:{}};
 let S=load();
+/* YouTube API policy: don't keep fetched data for more than 30 days */
+(function purgeOld(){const lim=Date.now()-30*864e5;let ch=false;
+  if(S.lastRefresh&&S.lastRefresh<lim){S.videos={};S.lastRefresh=0;ch=true}
+  for(const id in S.recs){const r=S.recs[id];if(!r||!r.at||r.at<lim||!S.lists.some(l=>l.id===id)){delete S.recs[id];ch=true}}
+  if(ch)save()})();
 let busy=false;
 const WEEK=7*864e5;
 function weekStart(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7);return d.getTime()}
