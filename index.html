@@ -222,6 +222,12 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .wz-img{display:flex;flex-direction:column;gap:12px;margin:6px 0 16px;align-items:center}
 .wz-img img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
 .wz-img img.tall{max-width:380px}
+.wz-safe{border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:0 0 14px}
+.wz-safe h4{margin:0 0 8px;font-size:14px;color:var(--ink)}
+.wz-safe ul{margin:0;padding:0;list-style:none}
+.wz-safe li{font-size:13px;color:var(--ink2);line-height:1.7;padding:6px 0;border-top:1px solid var(--line)}
+.wz-safe li:first-child{border-top:none;padding-top:0}
+.wz-safe li b{display:block;color:var(--ink)}
 .wz-note{background:#272727;border-radius:10px;padding:10px 14px;font-size:13px;color:var(--ink2);line-height:1.7;margin:0 0 14px}
 .wz-link{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px}
 .wz-opt{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
@@ -887,6 +893,13 @@ const LINK=(u,t)=>`<a class="btn wz-link" href="${u}" target="_blank" rel="noope
 const WZ=[
  {h:'SHELFへようこそ',b:()=>`<p class="wz-p">SHELFは、YouTubeの登録チャンネルを<b>自分で作ったリストごと</b>に分けて、今週の新着をまとめて確認できるアプリです。</p>
   <p class="wz-p">使い始めるには、YouTubeから動画の情報を受け取るための<b>「APIキー」</b>が必要です。APIキーは、Googleが発行する「SHELFがあなたの代わりにYouTubeに問い合わせるための合言葉」のようなもの。<b>無料・クレジットカード不要</b>で、5分ほどで作れます。</p>
+  <div class="wz-safe"><h4>🔒 安心して進めるために</h4><ul>
+   <li><b>お金はかかりません</b>クレジットカードの登録も不要です。途中で「無料で利用開始」やお支払いの案内が出ても、押さずに進めて大丈夫です。</li>
+   <li><b>アカウントやパスワードは使いません</b>APIキーは、公開されている動画の情報を見るためだけの合言葉です。SHELFがあなたのアカウントにログインしたり、登録・コメントなどの操作をしたりすることはできません。</li>
+   <li><b>キーは外部に送られません</b>キーはこのブラウザの中だけに保存され、Google（YouTube）への問い合わせにだけ使われます。</li>
+   <li><b>途中の同意や警告も案内します</b>利用規約への同意や黄色い警告が出る場面では、どれを押せばいいかをこのガイドで説明します。</li>
+   <li><b>いつでもやめられます</b>Google Cloudでキーを削除すれば、すぐに使えなくなります。</li>
+  </ul></div>
   <div class="wz-note">これから画像つきで1つずつ案内します。Googleの画面と、このガイドを行ったり来たりしながら進めてください。</div>
   <p class="hint">利用にあたっては<a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener" style="color:var(--accent)">YouTube利用規約</a>に同意したものとみなされます。データの扱いは<a href="privacy.html" target="_blank" rel="noopener" style="color:var(--accent)">プライバシーポリシー</a>をご覧ください。</p>`},
  {h:'プロジェクトを作る',b:()=>`<p class="wz-p">下のボタンでGoogle Cloudの作成画面が開きます。Googleアカウントでログインし、<b>名前はそのままで「作成」</b>を押してください。</p>
