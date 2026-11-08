@@ -969,9 +969,9 @@ function drawTour(){
   const sp=$('#tour .spot');Object.assign(sp.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
   // hole blocks clicks unless action step
   sp.style.pointerEvents=st.act?'none':'auto';
-  $('#tourTx').innerHTML=st.act?st.tx+'<br><span class="pulse">光っているボタンを押してください</span>':st.tx;
+  $('#tourTx').innerHTML=st.act?st.tx+'<br><span class="pulse">光っているボタンを押してください</span>（押さずに「次へ」で進むこともできます）':st.tx;
   $('#tourN').textContent=`${tI+1} / ${list.length}`;
-  $('#tourNext').hidden=!!st.act;$('#tourNext').textContent=tI===list.length-1?'完了':'次へ';
+  $('#tourNext').hidden=false;$('#tourNext').textContent=tI===list.length-1?'完了':'次へ';
   const bub=$('#tour .bub'),bw=300,bh=bub.offsetHeight||140;
   let bx=Math.min(Math.max(12,x+w/2-bw/2),W-bw-12),below=y+h+16+bh<H,by=below?y+h+16:Math.max(12,y-16-bh);
   bub.style.left=bx+'px';bub.style.top=by+'px';
