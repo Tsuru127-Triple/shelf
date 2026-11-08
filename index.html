@@ -56,6 +56,8 @@ header{height:56px;display:flex;align-items:center;gap:12px;padding:0 20px;borde
 header h1{font-size:17px;font-weight:700;margin:0;letter-spacing:.02em}
 #status{font-size:12px;color:var(--ink3);margin-right:4px;font-variant-numeric:tabular-nums}
 header .sp{flex:1}
+header .sub{font-size:12px;color:var(--ink3);white-space:nowrap}
+@media (max-width:560px){header .sub{display:none}}
 header .btn{white-space:nowrap;flex-shrink:0}
 
 .app{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr);height:calc(100vh - 56px)}
@@ -252,7 +254,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </head>
 <body>
 <header>
-  <h1 style="letter-spacing:.12em">SHELF</h1>
+  <h1 style="letter-spacing:.12em">SHELF</h1><span class="sub">登録チャンネルの新着チェック</span>
   <span class="sp"></span>
   <span id="status"></span>
   <button class="btn primary" id="btnRefresh">更新</button>
@@ -298,7 +300,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <details><summary>APIキーって何？どこで作る？</summary><p>YouTubeから動画情報を取得するための鍵です。上の「初期設定ガイド」で画像付きで手順を確認できます。Google Cloud Consoleでプロジェクトを作り、「YouTube Data API v3」を有効にして「認証情報」→「APIキー」で作成します。「OAuth同意画面を構成してください」という警告は、APIキーだけ使うなら無視して大丈夫です。</p></details>
       <details><summary>APIの使用量はどれくらい？</summary><p>1日1万までの無料枠があり、日本時間16〜17時ごろにリセットされます。「更新」は1回でおよそ登録チャンネル数＋数十、チャンネル検索とおすすめの取得は1回100使います。</p></details>
       <details><summary>新しい版のファイルに差し替えるには？</summary><p>新しいファイルをダウンロードしてChromeで開くだけです。APIキーやリストはブラウザに保存されているので引き継がれます。念のため、差し替え前にバックアップを書き出しておくと安心です。</p></details>
-      <details><summary>「今週の動画」と「一覧」の違いは？</summary><p>「今週の動画」は今週月曜0時以降、「一覧」はそれより前の動画です。一覧は50本ずつ表示し、最後まで見ると「さらに前の動画を読み込む」で過去の動画を追加取得できます（ブラウザを更新すると元に戻ります）。</p></details>
+      <details><summary>「今週の動画」と「一覧」の違いは？</summary><p>「今週の動画」は今週月曜0時以降、「一週間の動画」は今日を含む直近7日間、「一覧」はそれより前の動画です。見出しのプルダウンで切り替えられます。一覧は50本ずつ表示し、最後まで見ると「さらに前の動画を読み込む」で過去の動画を追加取得できます（ブラウザを更新すると元に戻ります）。</p></details>
       <details><summary>表示を切り替えるには？</summary><p>各見出しの右にあるアイコンで、リスト・タイル・グリッドをタブごとに選べます。目の斜線アイコンで見た動画を隠し、チェック2つのアイコンでまとめて視聴済みにできます。</p></details>
       <details><summary>視聴済みはどう判定している？</summary><p>このアプリ上でクリックした動画だけを視聴済みにしています。YouTubeで直接見た動画は、APIの仕様上反映できません。</p></details>
       <details><summary>アプリ内で動画を再生できない？</summary><p>手元のファイルとして開いている場合、YouTubeの埋め込み再生は仕様上エラーになるため、クリックするとYouTubeが開く形にしています。</p></details>
@@ -375,7 +377,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 <script>
 const KEY='ytl.v1';
-const DEF={apiKey:'',lists:[],channels:{},videos:{},seen:{},lastRefresh:0,sel:'all',hideSeen:false,rightTab:'list',recs:{},recNo:{}};
+const DEF={apiKey:'',lists:[],channels:{},videos:{},seen:{},lastRefresh:0,sel:'all',hideSeen:false,rightTab:'list',span:'week',recs:{},recNo:{}};
 let S=load();
 /* YouTube API policy: don't keep fetched data for more than 30 days */
 (function purgeOld(){const lim=Date.now()-30*864e5;let ch=false;
@@ -386,6 +388,10 @@ let busy=false;
 const WEEK=7*864e5;
 function weekStart(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(d.getDay()+6)%7);return d.getTime()}
 const lastWeekStart=()=>weekStart()-WEEK;
+function periodStart(){if(S.span!=='7d')return weekStart();const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-6);return d.getTime()}
+const SPANS={week:'今週の動画','7d':'一週間の動画'};
+const spanName=()=>SPANS[S.span]||SPANS.week;
+const beforeName=()=>S.span==='7d'?'一週間より前':'今週より前';
 const FATAL=new Set(['quotaExceeded','keyInvalid','accessNotConfigured','forbidden','dailyLimitExceeded','rateLimitExceeded']);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -495,7 +501,7 @@ function fmtTime(t){const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()}
 /* ---------- filters ---------- */
 const listExists=id=>S.lists.some(l=>l.id===id);
 function inSel(chId,sel=S.sel){const c=S.channels[chId];if(!c)return false;if(sel==='all')return true;if(sel==='none')return !c.listId||!listExists(c.listId);return c.listId===sel}
-const isWeek=v=>v.t>=weekStart();
+const isWeek=v=>v.t>=periodStart();
 function selName(){if(S.sel==='all')return 'すべて';if(S.sel==='none')return '未分類';return S.lists.find(l=>l.id===S.sel)?.name||''}
 
 /* ---------- render ---------- */
@@ -544,10 +550,10 @@ function renderFeed(){
   const unseen=vs.filter(v=>!S.seen[v.id]).length;
   if(S.hideSeen)vs=vs.filter(v=>!S.seen[v.id]);
   vs.sort((a,b)=>b.t-a.t);
-  let h=`<div class="feed-top"><h2>今週の動画</h2><span class="cnt">${esc(selName())}　${vs.length}本${unseen?`（未視聴 ${unseen}）`:''}</span><span class="sp"></span>
+  let h=`<div class="feed-top"><div class="dd"><button class="dd-btn" data-act="fdd" aria-haspopup="true" aria-expanded="${fddOpen}"><h2>${spanName()}</h2><svg viewBox="0 0 10 10"><path d="M0 2h10L5 8z"/></svg></button>${fddOpen?`<div class="dd-menu">${Object.entries(SPANS).map(([k,t])=>`<button data-span="${k}" class="${(S.span||'week')===k?'on':''}">${t}</button>`).join('')}</div>`:''}</div><span class="cnt">${esc(selName())}　${vs.length}本${unseen?`（未視聴 ${unseen}）`:''}</span><span class="sp"></span>
     ${listExists(S.sel)?'<button class="ghost" data-act="pick">＋ チャンネルを追加</button>':''}
     <span class="tools"><button class="ib ${S.hideSeen?'on':''}" data-act="hide" title="見たものを隠す" aria-label="見たものを隠す" aria-pressed="${S.hideSeen}">${IC.hide}</button><button class="ib" data-act="allseen" title="すべて見たことにする" aria-label="すべて見たことにする">${IC.checks}</button><span class="vdiv"></span>${vsegHTML('feed')}</span></div>`;
-  if(!vs.length){h+=`<div class="empty" style="margin-top:32px"><p>このリストに今週の新着はありません。</p></div>`;f.innerHTML=h;return}
+  if(!vs.length){h+=`<div class="empty" style="margin-top:32px"><p>このリストに${S.span==='7d'?'この一週間':'今週'}の新着はありません。</p></div>`;f.innerHTML=h;return}
   h+=videoRows(vs,{view:viewOf('feed')});
   f.innerHTML=h;
 }
@@ -581,7 +587,7 @@ function videoRows(vs,opt={}){
   return groups.map(g=>(g.lab?`<div class="day">${g.lab}</div>`:'')+`<div class="vlist ${opt.view||'list'}">${g.items.map(v=>vcard(v,opt)).join('')}</div>`).join('');
 }
 
-let orderLimit=50,ddOpen=false,older={},nextTok={},olderBusy=false;
+let orderLimit=50,ddOpen=false,fddOpen=false,older={},nextTok={},olderBusy=false;
 async function removeShorts(nv){
   const cand=[...new Set(Object.values(nv).filter(v=>v.dur>0&&v.dur<=181&&v.live==='none').map(v=>v.ch))];
   let sd=0;
@@ -618,14 +624,14 @@ function renderOrder(){
   const tri='<svg viewBox="0 0 10 10"><path d="M0 2h10L5 8z"/></svg>';
   let h=`<div class="feed-top"><div class="dd"><button class="dd-btn" data-act="dd" aria-haspopup="true" aria-expanded="${ddOpen}"><h2>${rec?'おすすめ':'一覧'}</h2>${tri}</button>${ddOpen?`<div class="dd-menu"><button data-tab="list" class="${rec?'':'on'}">一覧</button><button data-tab="rec" class="${rec?'on':''}">おすすめ</button></div>`:''}</div>`;
   if(rec){o.innerHTML=h+`<span class="cnt">${esc(selName())}</span></div>`+recHTML();ensureRecs();return}
-  let vs=Object.values({...older,...S.videos}).filter(v=>v.t<weekStart()&&inSel(v.ch));
+  let vs=Object.values({...older,...S.videos}).filter(v=>v.t<periodStart()&&inSel(v.ch));
   if(S.hideSeen)vs=vs.filter(v=>!S.seen[v.id]);
   vs.sort((a,b)=>b.t-a.t);
-  h+=`<span class="cnt">${esc(selName())}　今週より前 ${Math.min(orderLimit,vs.length)} / ${vs.length}本</span><span class="sp"></span>${vsegHTML('order')}</div>`;
+  h+=`<span class="cnt">${esc(selName())}　${beforeName()} ${Math.min(orderLimit,vs.length)} / ${vs.length}本</span><span class="sp"></span>${vsegHTML('order')}</div>`;
   h+=videoRows(vs.slice(0,orderLimit),{view:viewOf('order')});
   if(vs.length>orderLimit)h+=`<button class="more-btn" data-act="more">さらに${Math.min(50,vs.length-orderLimit)}本を表示</button>`;
   else if(Object.keys(S.channels).some(id=>inSel(id)&&tokOf(id)))h+=`<button class="more-btn" data-act="older" ${olderBusy?'disabled':''}>${olderBusy?'読み込み中…':'さらに前の動画を読み込む'}</button>`;
-  if(!vs.length)h+='<div class="empty" style="margin-top:24px"><p>今週より前の動画はありません。</p></div>';
+  if(!vs.length)h+='<div class="empty" style="margin-top:24px"><p>${beforeName()}の動画はありません。</p></div>';
   o.innerHTML=h;
 }
 
@@ -739,7 +745,7 @@ $('#menu').addEventListener('click',e=>{
   if(a==='rename'){const n=prompt('新しいリスト名',l.name);if(n&&n.trim()){l.name=n.trim();save();render()}}
   if(a==='delete'&&confirm(`「${l.name}」を削除しますか？\nリスト内のチャンネルは未分類に戻ります。`)){S.lists=S.lists.filter(x=>x.id!==l.id);for(const c of Object.values(S.channels))if(c.listId===l.id)c.listId='';save();render()}
 });
-document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('[data-menu]'))closeMenu();if(ddOpen&&!e.target.closest('.dd')){ddOpen=false;renderOrder()}});
+document.addEventListener('click',e=>{if(!e.target.closest('#menu')&&!e.target.closest('[data-menu]'))closeMenu();const inDD=e.composedPath().find(n=>n.classList&&n.classList.contains('dd'));if(ddOpen&&!(inDD&&!inDD.querySelector('[data-act="fdd"]'))){ddOpen=false;renderOrder()}if(fddOpen&&!(inDD&&inDD.querySelector('[data-act="fdd"]'))){fddOpen=false;renderFeed()}});
 
 $('#lists').addEventListener('click',e=>{
   const mm=e.target.closest('[data-menu]');if(mm){e.stopPropagation();openMenu(mm.dataset.menu,mm);return}
@@ -752,6 +758,8 @@ $('#lists').addEventListener('keydown',e=>{const mm=e.target.closest('[data-menu
 
 /* ---------- feed actions ---------- */
 $('#feed').addEventListener('click',e=>{
+  if(e.target.closest('[data-act="fdd"]')){fddOpen=!fddOpen;renderFeed();return}
+  const sp=e.target.closest('[data-span]');if(sp){fddOpen=false;S.span=sp.dataset.span;orderLimit=50;save();render();$('#feed').scrollTop=0;$('#order').scrollTop=0;return}
   const o=e.target.closest('[data-open]');if(o){openDlg(o.dataset.open);return}
   const a=e.target.closest('[data-act]');
   if(a?.dataset.act==='refresh'){refresh();return}
@@ -968,7 +976,7 @@ $('#btnWipe').onclick=()=>{if(confirm('SHELFのデータをすべて削除しま
 /* ---------- screen tour ---------- */
 const TOUR=[
  {sel:'#btnRefresh',tx:'まずは<b>「更新」</b>を押してみましょう。登録チャンネルの新着をまとめて取ってきます。',act:true,cond:()=>S.apiKey&&(Object.keys(S.channels).length||S.myChannel)},
- {sel:'#feed .feed-top h2',tx:'今週（月曜から）公開された動画がここに並びます。クリックするとYouTubeで開き、見た動画は暗く表示されます。'},
+ {sel:'#feed .feed-top h2',tx:'今週（月曜から）公開された動画がここに並びます。見出しを押すと<b>「一週間の動画」</b>（今日を含む直近7日間）に切り替えられます。クリックするとYouTubeで開き、見た動画は暗く表示されます。'},
  {sel:'#feed .tools',tx:'目のアイコンで<b>見た動画を隠す</b>、チェックで<b>まとめて視聴済み</b>。右の3つのアイコンで<b>リスト・タイル・グリッド</b>を切り替えられます。'},
  {sel:'#order .dd-btn',tx:'今週より前の動画はこちら。見出しを押すと、リストに合った動画の<b>「おすすめ」</b>に切り替えられます。'},
  {sel:'#btnAddList',tx:'<b>「＋ リストを作成」</b>で、音楽・ゲームのようにチャンネルを分けられます。リスト横の「⋯」からチャンネル追加や名前変更ができます。'},
