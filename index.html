@@ -46,6 +46,7 @@ header{height:56px;display:flex;align-items:center;gap:12px;padding:0 20px;borde
 header h1{font-size:17px;font-weight:700;margin:0;letter-spacing:.02em}
 #status{font-size:12px;color:var(--ink3);margin-right:4px;font-variant-numeric:tabular-nums}
 header .sp{flex:1}
+header .btn{white-space:nowrap;flex-shrink:0}
 
 .app{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr);height:calc(100vh - 56px)}
 .col{overflow-y:auto;min-height:0;scrollbar-width:none}
@@ -511,9 +512,9 @@ function renderFeed(){
   if(!hasKey||!hasCh||!S.lastRefresh){
     f.innerHTML=`<div class="empty"><h2>はじめに</h2><p>登録チャンネルの新着を、自分で作ったリストごとに確認できます。</p>
     <ol class="steps">
-      <li class="${hasKey?'done':''}"><span></span><div><b>APIキーを設定</b><p>YouTubeから動画情報を取得するために使います。無料で発行できます。</p><button class="btn ${hasKey?'':'primary'}" data-open="#dlgSettings">${hasKey?'設定済み':'APIキーを設定'}</button></div></li>
-      <li class="${hasCh?'done':''}"><span></span><div><b>登録チャンネルを読み込む</b><p>設定で自分のチャンネルを連携するか、Google Takeoutの書き出しファイルから取り込めます。</p><button class="btn ${hasKey&&!hasCh?'primary':''}" data-open="#dlgChannels">${hasCh?Object.keys(S.channels).length+'件 読み込み済み':'チャンネルを読み込む'}</button></div></li>
-      <li><span></span><div><b>新着を取得</b><p>以降は「更新」を押すか、1時間以上たってから開くと自動で更新されます。</p><button class="btn ${hasKey&&hasCh?'primary':''}" data-act="refresh">新着を取得</button></div></li>
+      <li class="${hasKey?'done':''}"><div><b>APIキーを設定</b><p>YouTubeから動画情報を取得するために使います。無料で発行できます。</p><button class="btn ${hasKey?'':'primary'}" data-open="#dlgSettings">${hasKey?'設定済み':'APIキーを設定'}</button></div></li>
+      <li class="${hasCh?'done':''}"><div><b>登録チャンネルを読み込む</b><p>設定で自分のチャンネルを連携するか、Google Takeoutの書き出しファイルから取り込めます。</p><button class="btn ${hasKey&&!hasCh?'primary':''}" data-open="#dlgChannels">${hasCh?Object.keys(S.channels).length+'件 読み込み済み':'チャンネルを読み込む'}</button></div></li>
+      <li><div><b>新着を取得</b><p>以降は「更新」を押すか、1時間以上たってから開くと自動で更新されます。</p><button class="btn ${hasKey&&hasCh?'primary':''}" data-act="refresh">新着を取得</button></div></li>
     </ol></div>`;
     return;
   }
