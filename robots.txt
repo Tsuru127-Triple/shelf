@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tsuru127-triple.github.io/shelf/sitemap.xml
