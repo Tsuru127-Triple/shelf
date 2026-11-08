@@ -214,10 +214,24 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   #feed{padding:0 14px 30px}
   .v .th{width:42vw}
 }
-#dlgCal{width:min(940px,96vw);height:min(860px,92vh)}
+#dlgCal{width:min(1500px,97vw);height:95vh;max-height:95vh}
+#calBody{display:flex;flex-direction:column}
+.cal-pick{position:relative;width:280px;max-width:100%}
+.cal-pick input{width:100%;border-radius:18px!important;background:#181818!important;padding:6px 14px!important}
+.cal-list{position:absolute;top:100%;left:0;right:0;margin-top:4px;max-height:320px;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;z-index:6;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.cal-list button{display:flex;align-items:center;gap:8px;width:100%;border:none;background:none;padding:6px 8px;border-radius:6px;text-align:left}
+.cal-list button:hover,.cal-list button.hi{background:var(--hover)}
+.cal-list img,.cal-list .ph{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:var(--line);object-fit:cover}
+.cal-list span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-list .none{padding:8px;color:var(--ink3);font-size:13px}
+.cal-wds{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:4px}
+@media (min-width:601px){
+  .cal-grid{flex:1;min-height:0;grid-auto-rows:minmax(0,1fr)}
+  .cal-d{min-height:0;overflow:hidden}
+  .cth{flex:0 1 auto;min-height:24px}
+}
 #dlgCal .dh{gap:10px;flex-wrap:wrap}
 #dlgCal .dh h3{margin:0}
-.cal-sel{max-width:240px;border-radius:18px!important;background:#181818!important}
 .cal-nav{display:flex;align-items:center;gap:6px;margin-left:auto}
 .cal-nav b{font-size:16px;min-width:104px;text-align:center;font-variant-numeric:tabular-nums}
 .cal-nav .ib{background:#272727;color:var(--ink);font-size:18px}
@@ -260,7 +274,8 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   #dlgCal .dh{padding:12px}
   #dlgCal .dh h3{flex:1 0 calc(100% - 90px);white-space:nowrap}
   #dlgCal .dh [data-close]{order:1;margin-left:auto}
-  .cal-sel{order:2;max-width:none;flex:1 1 120px;min-width:0}
+  .cal-pick{order:2;width:auto;flex:1 1 120px;min-width:0}
+  .cal-wds{gap:3px}
   .cal-nav{order:3;margin-left:0}
   .cal-nav b{min-width:92px;font-size:15px}
 }
@@ -425,10 +440,10 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 </dialog>
 
 <dialog id="dlgCal">
-  <div class="dh"><h3>投稿カレンダー</h3><select id="calCh" class="cal-sel" aria-label="チャンネル"></select>
+  <div class="dh"><h3>投稿カレンダー</h3><div class="cal-pick"><input type="search" id="calQ" placeholder="チャンネル名で検索" autocomplete="off" aria-label="チャンネルを検索"><div class="cal-list" id="calList" hidden></div></div>
     <div class="cal-nav"><button class="ib" id="calPrev" aria-label="前の月">‹</button><b id="calMon"></b><button class="ib" id="calNext" aria-label="次の月">›</button></div>
     <button class="ghost" data-close>閉じる</button></div>
-  <div class="db" id="calBody"><div class="cal-sum" id="calSum"></div><div class="cal-grid" id="calGrid"></div></div>
+  <div class="db" id="calBody"><div class="cal-sum" id="calSum"></div><div class="cal-wds" id="calWds"></div><div class="cal-grid" id="calGrid"></div></div>
   <div id="calPop" hidden></div>
 </dialog>
 
@@ -1044,8 +1059,8 @@ function openCal(ch){
   if(!chs.length){toast('先にチャンネルを読み込んでください。',true);return}
   const d=new Date();CAL.y=d.getFullYear();CAL.m=d.getMonth();
   CAL.ch=ch&&S.channels[ch]?ch:S.channels[S.calCh]?S.calCh:chs[0].id;
-  $('#calCh').innerHTML=chs.map(c=>`<option value="${esc(c.id)}">${esc(c.title||c.id)}</option>`).join('');
-  $('#calCh').value=CAL.ch;
+  $('#calQ').value=S.channels[CAL.ch]?.title||'';$('#calList').hidden=true;
+  $('#calWds').innerHTML=[...WD].map((w,i)=>`<div class="cal-wd ${i===0?'su':i===6?'sa':''}">${w}</div>`).join('');
   $('#dlgCal').showModal();loadCal();
 }
 async function loadCal(){
@@ -1094,7 +1109,7 @@ function renderCal(){
   }
   $('#calSum').innerHTML=sum;
   const byDay={};vs.forEach(v=>{const d=new Date(v.t).getDate();(byDay[d]=byDay[d]||[]).push(v)});
-  let h=[...WD].map((w,i)=>`<div class="cal-wd ${i===0?'su':i===6?'sa':''}">${w}</div>`).join('');
+  let h='';
   const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
   for(let i=0;i<first;i++)h+='<div class="cal-d out"></div>';
   const isToday=d=>y===now.getFullYear()&&m===now.getMonth()&&d===now.getDate();
@@ -1141,7 +1156,34 @@ $('#calGrid').addEventListener('click',e=>{
 $('#dlgCal').addEventListener('click',e=>{const p=$('#calPop');if(!p.hidden&&p.classList.contains('click')&&!e.target.closest('#calPop')&&!e.target.closest('[data-cd]')&&!e.target.closest('[data-cv]'))calPopHide()});
 $('#calBody').addEventListener('scroll',calPopHide);
 $('#dlgCal').addEventListener('close',calPopHide);
-$('#calCh').onchange=e=>{CAL.ch=e.target.value;S.calCh=CAL.ch;save();if(!CAL.busy)loadCal()};
+let calHi=0;
+function calMatches(){
+  const q=$('#calQ').value.trim().toLowerCase();
+  const chs=Object.values(S.channels).sort((a,b)=>(a.title||'').localeCompare(b.title||'','ja'));
+  return q?chs.filter(c=>(c.title||'').toLowerCase().includes(q)||(c.handle||'').toLowerCase().includes(q)):chs;
+}
+function calListDraw(){
+  const ms=calMatches().slice(0,100);calHi=Math.min(calHi,Math.max(0,ms.length-1));
+  $('#calList').innerHTML=ms.length?ms.map((c,i)=>`<button data-pc="${esc(c.id)}" class="${i===calHi?'hi':''}">${c.thumb?`<img src="${esc(c.thumb)}" alt="" loading="lazy">`:'<span class="ph"></span>'}<span>${esc(c.title||c.id)}</span></button>`).join(''):'<div class="none">見つかりません</div>';
+  $('#calList').hidden=false;
+}
+function calPick(id){
+  $('#calList').hidden=true;if(!id)return;
+  CAL.ch=id;S.calCh=id;save();$('#calQ').value=S.channels[id]?.title||'';$('#calQ').blur();
+  if(!CAL.busy)loadCal();
+}
+$('#calQ').addEventListener('focus',e=>{e.target.placeholder=S.channels[CAL.ch]?.title||'チャンネル名で検索';e.target.value='';calHi=0;calListDraw()});
+$('#calQ').addEventListener('input',()=>{calHi=0;calListDraw()});
+$('#calQ').addEventListener('keydown',e=>{
+  const n=$('#calList').querySelectorAll('[data-pc]').length;
+  if(e.key==='ArrowDown'){e.preventDefault();calHi=Math.min(n-1,calHi+1);calListDraw();$('#calList .hi')?.scrollIntoView({block:'nearest'})}
+  else if(e.key==='ArrowUp'){e.preventDefault();calHi=Math.max(0,calHi-1);calListDraw();$('#calList .hi')?.scrollIntoView({block:'nearest'})}
+  else if(e.key==='Enter'){e.preventDefault();calPick($('#calList .hi')?.dataset.pc)}
+  else if(e.key==='Escape'&&!$('#calList').hidden){e.preventDefault();e.stopPropagation();$('#calList').hidden=true;$('#calQ').value=S.channels[CAL.ch]?.title||'';$('#calQ').blur()}
+});
+$('#calList').addEventListener('mousedown',e=>e.preventDefault());
+$('#calList').addEventListener('click',e=>{const b=e.target.closest('[data-pc]');if(b)calPick(b.dataset.pc)});
+$('#calQ').addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==$('#calQ')){$('#calList').hidden=true;$('#calQ').value=S.channels[CAL.ch]?.title||''}},150));
 $('#calPrev').onclick=()=>{if(--CAL.m<0){CAL.m=11;CAL.y--}if(CAL.busy)renderCal();else loadCal()};
 $('#calNext').onclick=()=>{if(++CAL.m>11){CAL.m=0;CAL.y++}if(CAL.busy)renderCal();else loadCal()};
 $('#btnCal').onclick=()=>{$('#dlgSettings').close();openCal()};
