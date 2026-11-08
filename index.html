@@ -60,7 +60,7 @@ header h1 .logo{width:22px;height:22px;flex-shrink:0}
 #status{font-size:12px;color:var(--ink3);margin-right:4px;font-variant-numeric:tabular-nums}
 header .sp{flex:1}
 header .sub{font-size:12px;color:var(--ink3);white-space:nowrap}
-@media (max-width:560px){header .sub{display:none}}
+@media (max-width:560px){header .sub,#status{display:none}header{padding:0 12px;gap:8px}header .btn{padding:6px 12px}}
 header .btn{white-space:nowrap;flex-shrink:0}
 
 .app{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,1fr);height:calc(100vh - 56px)}
@@ -214,6 +214,56 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   #feed{padding:0 14px 30px}
   .v .th{width:42vw}
 }
+#dlgCal{width:min(940px,96vw);height:min(860px,92vh)}
+#dlgCal .dh{gap:10px;flex-wrap:wrap}
+#dlgCal .dh h3{margin:0}
+.cal-sel{max-width:240px;border-radius:18px!important;background:#181818!important}
+.cal-nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.cal-nav b{font-size:16px;min-width:104px;text-align:center;font-variant-numeric:tabular-nums}
+.cal-nav .ib{background:#272727;color:var(--ink);font-size:18px}
+.cal-nav .ib:disabled{opacity:.35;cursor:default}
+.cal-sum{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--ink2);margin:0 0 10px}
+.cal-sum b{color:var(--ink)}
+.cal-sum .err{color:var(--danger)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-wd{font-size:12px;color:var(--ink3);text-align:center;padding:2px 0}
+.cal-wd.su{color:#FF7B72}.cal-wd.sa{color:#79B8FF}
+.cal-d{min-height:96px;background:#181818;border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.cal-d.out{background:none}
+.cal-d .n{font-size:12px;color:var(--ink2);line-height:1.2}
+.cal-d.today{outline:2px solid var(--accent);outline-offset:-2px}.cal-d.today .n{color:var(--accent);font-weight:700}
+.cal-grid.busy .cal-d{opacity:.45}
+.cth{position:relative;display:block;aspect-ratio:16/9;border-radius:5px;overflow:hidden;background:var(--line)}
+.cth img{width:100%;height:100%;object-fit:cover;display:block}
+.cth .t{position:absolute;left:0;right:0;bottom:0;font-size:10px;line-height:1.3;padding:10px 4px 3px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.88));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cth .lv{position:absolute;top:3px;left:3px;font-size:9px;font-weight:700;color:#fff;background:#C4302B;padding:0 4px;border-radius:3px;line-height:1.5}
+.cth .lv.up{background:#065FD4}
+.cth:hover{outline:2px solid var(--ink)}
+.cal-more{border:none;font-size:11px;color:var(--ink2);background:#272727;border-radius:4px;padding:1px 0}
+.cal-more:hover{background:#3F3F3F;color:var(--ink)}
+#calPop{position:fixed;z-index:5;width:260px;background:#2B2B2B;border:1px solid var(--line);border-radius:10px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.6);font-size:12px;pointer-events:none}
+#calPop.click{pointer-events:auto}
+#calPop .big{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;display:block;margin-bottom:8px;background:var(--line)}
+#calPop b{display:block;font-size:13px;line-height:1.45;margin-bottom:4px}
+#calPop .m{color:var(--ink2)}
+#calPop .go{display:inline-block;margin-top:8px;color:var(--accent)}
+#calPop .dl a{display:flex;gap:8px;align-items:center;padding:5px;border-radius:6px}
+#calPop .dl a:hover{background:var(--hover)}
+#calPop .dl img{width:72px;aspect-ratio:16/9;object-fit:cover;border-radius:4px;flex-shrink:0}
+#calPop .dl span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.4}
+@media (max-width:600px){
+  #dlgCal .db{padding:12px 8px}
+  .cal-grid{gap:3px}
+  .cal-d{min-height:60px;padding:3px}
+  .cth .t{display:none}
+  .cth .lv{font-size:8px;padding:0 2px;top:2px;left:2px}
+  #dlgCal .dh{padding:12px}
+  #dlgCal .dh h3{flex:1 0 calc(100% - 90px);white-space:nowrap}
+  #dlgCal .dh [data-close]{order:1;margin-left:auto}
+  .cal-sel{order:2;max-width:none;flex:1 1 120px;min-width:0}
+  .cal-nav{order:3;margin-left:0}
+  .cal-nav b{min-width:92px;font-size:15px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 #dlgWiz{width:min(760px,94vw);height:min(860px,92vh)}
@@ -279,6 +329,11 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <div class="sec">
       <h4>ガイド</h4>
       <div class="row"><button class="btn" id="btnWiz">初期設定ガイドを開く</button><button class="btn" id="btnTour">画面の使い方ツアー</button></div>
+    </div>
+    <div class="sec">
+      <h4>試験機能</h4>
+      <div class="row"><button class="btn" id="btnCal">投稿カレンダー（試験版）</button></div>
+      <p class="hint">チャンネルを選ぶと、その月の何日に動画を投稿したかをサムネつきのカレンダーで確認できます。</p>
     </div>
     <div class="sec">
       <h4>YouTube Data APIキー</h4>
@@ -367,6 +422,14 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <table class="ctab"><tbody id="pickRows"></tbody></table>
   </div>
   <div class="df"><span class="cnt" id="pickN" style="color:var(--ink2);font-size:13px"></span><button class="btn" data-close>キャンセル</button><button class="btn primary" id="pickSave">保存</button></div>
+</dialog>
+
+<dialog id="dlgCal">
+  <div class="dh"><h3>投稿カレンダー</h3><select id="calCh" class="cal-sel" aria-label="チャンネル"></select>
+    <div class="cal-nav"><button class="ib" id="calPrev" aria-label="前の月">‹</button><b id="calMon"></b><button class="ib" id="calNext" aria-label="次の月">›</button></div>
+    <button class="ghost" data-close>閉じる</button></div>
+  <div class="db" id="calBody"><div class="cal-sum" id="calSum"></div><div class="cal-grid" id="calGrid"></div></div>
+  <div id="calPop" hidden></div>
 </dialog>
 
 <dialog id="dlgWiz">
@@ -972,6 +1035,116 @@ $('#wzNext').onclick=()=>{
 };
 $('#wzBack').onclick=()=>{if(wzI>0){wzI--;drawWiz()}};
 $('#wzLater').onclick=()=>{S.tutDone=true;save();$('#dlgWiz').close()};
+/* ---------- posting calendar (beta) ---------- */
+const CAL={ch:'',y:0,m:0,cache:{},busy:false,err:''};
+const calTouch=()=>matchMedia('(hover: none)').matches;
+function openCal(ch){
+  if(!S.apiKey){toast('先にAPIキーを設定してください。',true);return}
+  const chs=Object.values(S.channels).sort((a,b)=>(a.title||'').localeCompare(b.title||'','ja'));
+  if(!chs.length){toast('先にチャンネルを読み込んでください。',true);return}
+  const d=new Date();CAL.y=d.getFullYear();CAL.m=d.getMonth();
+  CAL.ch=ch&&S.channels[ch]?ch:S.channels[S.calCh]?S.calCh:chs[0].id;
+  $('#calCh').innerHTML=chs.map(c=>`<option value="${esc(c.id)}">${esc(c.title||c.id)}</option>`).join('');
+  $('#calCh').value=CAL.ch;
+  $('#dlgCal').showModal();loadCal();
+}
+async function loadCal(){
+  const chId=CAL.ch,y=CAL.y,m=CAL.m,mk=y+'-'+m;CAL.err='';calPopHide();
+  const c=CAL.cache[chId]||(CAL.cache[chId]={entries:[],tok:undefined,oldest:Infinity,vids:{},checked:new Set(),months:new Set()});
+  if(c.months.has(mk)){renderCal();return}
+  CAL.busy=true;renderCal();
+  try{
+    const ms=new Date(y,m,1).getTime(),me=new Date(y,m+1,1).getTime(),pad=3*864e5;
+    const pl=S.channels[chId]?.uploads||('UU'+chId.slice(2));
+    let pages=0;
+    while(c.tok!==null&&c.oldest>=ms-pad&&pages<40){
+      const j=await api('playlistItems',{part:'contentDetails',playlistId:pl,maxResults:50,...(c.tok?{pageToken:c.tok}:{})});
+      for(const it of j.items||[]){const cd=it.contentDetails||{};const t=Date.parse(cd.videoPublishedAt||'')||Date.now();c.entries.push({id:cd.videoId,t});if(t<c.oldest)c.oldest=t}
+      c.tok=j.nextPageToken||null;pages++;
+    }
+    const want=[...new Set(c.entries.filter(e=>e.t>=ms-pad&&e.t<me+pad&&!c.checked.has(e.id)).map(e=>e.id))];
+    const nv={};
+    for(const part of chunk(want,50)){
+      const j=await api('videos',{part:'snippet,contentDetails,statistics,liveStreamingDetails',id:part.join(','),maxResults:50});
+      for(const it of j.items||[]){const v=mkVideo(it,chId);v.wl=!!it.liveStreamingDetails;nv[v.id]=v}
+    }
+    await removeShorts(nv);setStatus();
+    want.forEach(id=>c.checked.add(id));Object.assign(c.vids,nv);c.months.add(mk);
+  }catch(e){CAL.err=e.message}
+  finally{CAL.busy=false;if(CAL.ch===chId&&CAL.y===y&&CAL.m===m)renderCal();else loadCal()}
+}
+function calMonthVids(){
+  const c=CAL.cache[CAL.ch];if(!c)return [];
+  const ms=new Date(CAL.y,CAL.m,1).getTime(),me=new Date(CAL.y,CAL.m+1,1).getTime();
+  return Object.values(c.vids).filter(v=>v.t>=ms&&v.t<me).sort((a,b)=>a.t-b.t);
+}
+function renderCal(){
+  const y=CAL.y,m=CAL.m,now=new Date();
+  $('#calMon').textContent=`${y}年${m+1}月`;
+  $('#calNext').disabled=y>now.getFullYear()||(y===now.getFullYear()&&m>=now.getMonth());
+  const vs=calMonthVids();
+  let sum;
+  if(CAL.busy)sum='<span>読み込み中…</span>';
+  else if(CAL.err)sum=`<span class="err">${esc(CAL.err)}</span>`;
+  else{
+    const wc=[0,0,0,0,0,0,0];vs.forEach(v=>wc[new Date(v.t).getDay()]++);
+    const mx=Math.max(...wc);const top=vs.length>=3?wc.map((n,i)=>n===mx?i:-1).filter(i=>i>=0):[];
+    sum=`<span>投稿 <b>${vs.length}本</b></span><span>ライブ <b>${vs.filter(v=>v.wl).length}回</b></span>`+
+      (top.length&&top.length<=3?`<span>よく投稿する曜日 <b>${top.map(i=>WD[i]).join('・')}</b></span>`:'');
+  }
+  $('#calSum').innerHTML=sum;
+  const byDay={};vs.forEach(v=>{const d=new Date(v.t).getDate();(byDay[d]=byDay[d]||[]).push(v)});
+  let h=[...WD].map((w,i)=>`<div class="cal-wd ${i===0?'su':i===6?'sa':''}">${w}</div>`).join('');
+  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++)h+='<div class="cal-d out"></div>';
+  const isToday=d=>y===now.getFullYear()&&m===now.getMonth()&&d===now.getDate();
+  for(let d=1;d<=days;d++){
+    const ps=byDay[d]||[];const show=ps.length>2?ps.slice(0,1):ps;
+    h+=`<div class="cal-d ${isToday(d)?'today':''}"><span class="n">${d}</span>`+show.map(calThumb).join('')+
+      (ps.length>2?`<button class="cal-more" data-cd="${d}">+${ps.length-1}本</button>`:'')+'</div>';
+  }
+  const tail=(7-(first+days)%7)%7;for(let i=0;i<tail;i++)h+='<div class="cal-d out"></div>';
+  $('#calGrid').innerHTML=h;$('#calGrid').classList.toggle('busy',CAL.busy);
+}
+function calThumb(v){
+  const lv=v.t>Date.now()?'<span class="lv up">予定</span>':v.wl?'<span class="lv">LIVE</span>':'';
+  return `<a class="cth" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener" data-cv="${esc(v.id)}"><img src="${esc(v.thumb||'')}" alt="" loading="lazy">${lv}<span class="t">${esc(v.title)}</span></a>`;
+}
+function calFind(id){return CAL.cache[CAL.ch]?.vids[id]}
+function calPopAt(el,html,click){
+  const p=$('#calPop');p.innerHTML=html;p.classList.toggle('click',!!click);p.hidden=false;
+  const r=el.getBoundingClientRect(),pw=p.offsetWidth,ph=p.offsetHeight,W=innerWidth,H=innerHeight;
+  let x=r.right+8;if(x+pw>W-8)x=r.left-pw-8;if(x<8)x=Math.max(8,Math.min(W-pw-8,r.left+r.width/2-pw/2));
+  let yy=r.top;if(yy+ph>H-8)yy=H-ph-8;if(x===r.right+8||x===r.left-pw-8){}else{yy=r.bottom+8;if(yy+ph>H-8)yy=Math.max(8,r.top-ph-8)}
+  p.style.left=x+'px';p.style.top=Math.max(8,yy)+'px';
+}
+function calPopHide(){const p=$('#calPop');if(p)p.hidden=true}
+function calVidPop(v){
+  const d=new Date(v.t);
+  const meta=`${d.getMonth()+1}月${d.getDate()}日（${WD[d.getDay()]}）${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}${v.t>Date.now()?' 公開予定':' 公開'}`+(v.dur?`・${fmtDur(v.dur)}`:'')+(v.views?`・▶ ${fmtViews(v.views)}`:'');
+  return `<img class="big" src="${esc(v.thumb||'')}" alt=""><b>${esc(v.title)}</b><div class="m">${meta}</div>`;
+}
+$('#calGrid').addEventListener('mouseover',e=>{
+  if(calTouch()||$('#calPop').classList.contains('click'))return;
+  const a=e.target.closest('[data-cv]');if(!a){calPopHide();return}
+  const v=calFind(a.dataset.cv);if(v)calPopAt(a,calVidPop(v),false);
+});
+$('#calGrid').addEventListener('mouseleave',()=>{if(!$('#calPop').classList.contains('click'))calPopHide()});
+$('#calGrid').addEventListener('click',e=>{
+  const mo=e.target.closest('[data-cd]');
+  if(mo){const d=+mo.dataset.cd;const ps=calMonthVids().filter(v=>new Date(v.t).getDate()===d);
+    calPopAt(mo,`<b>${CAL.m+1}月${d}日の動画（${ps.length}本）</b><div class="dl">${ps.map(v=>`<a href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener"><img src="${esc(v.thumb||'')}" alt=""><span>${esc(v.title)}</span></a>`).join('')}</div>`,true);return}
+  const a=e.target.closest('[data-cv]');
+  if(a&&calTouch()){e.preventDefault();const v=calFind(a.dataset.cv);if(v)calPopAt(a,calVidPop(v)+`<a class="go" href="${a.href}" target="_blank" rel="noopener">YouTubeで開く ↗</a>`,true);return}
+  if(a)calPopHide();
+});
+$('#dlgCal').addEventListener('click',e=>{const p=$('#calPop');if(!p.hidden&&p.classList.contains('click')&&!e.target.closest('#calPop')&&!e.target.closest('[data-cd]')&&!e.target.closest('[data-cv]'))calPopHide()});
+$('#calBody').addEventListener('scroll',calPopHide);
+$('#dlgCal').addEventListener('close',calPopHide);
+$('#calCh').onchange=e=>{CAL.ch=e.target.value;S.calCh=CAL.ch;save();if(!CAL.busy)loadCal()};
+$('#calPrev').onclick=()=>{if(--CAL.m<0){CAL.m=11;CAL.y--}if(CAL.busy)renderCal();else loadCal()};
+$('#calNext').onclick=()=>{if(++CAL.m>11){CAL.m=0;CAL.y++}if(CAL.busy)renderCal();else loadCal()};
+$('#btnCal').onclick=()=>{$('#dlgSettings').close();openCal()};
 $('#btnWiz').onclick=()=>{$('#dlgSettings').close();openWiz(0)};
 $('#btnTour').onclick=()=>{$('#dlgSettings').close();setTimeout(startTour,200)};
 $('#btnWipe').onclick=()=>{if(confirm('SHELFのデータをすべて削除しますか？\nAPIキー・リスト・視聴済みの記録が消え、元に戻せません。')){try{localStorage.removeItem(KEY)}catch(_){}location.reload()}};
